@@ -12,6 +12,7 @@ typedef struct {
   float radius;
   float speed;
   bool showClone;
+  Vector2 velocity;
 } Player;
 
 void checkBoundaries(Player* player, const World* world);
@@ -19,13 +20,14 @@ void checkBoundaries(Player* player, const World* world);
 int main(void) {
 
 
-  const World world = {800, 450};
+  const World world = {1900, 1000};
   Player player = {
     .pos = {(float) world.width / 2, (float) world.height / 2},
     .clonePos = (0, 0),
     .radius = 50,
-    .speed = 400,
-    .showClone = false
+    .speed = 100,
+    .showClone = false,
+    .velocity = {0, 0}
   };
 
   InitWindow(world.width, world.height, "Test Window");
@@ -37,21 +39,26 @@ int main(void) {
   while(!WindowShouldClose()){
   
   if(IsKeyDown(KEY_W)){
-      player.pos.y -= GetFrameTime() * player.speed;
+      player.velocity.y -= GetFrameTime() * player.speed;
     }
 
   if(IsKeyDown(KEY_S)){
-      player.pos.y += GetFrameTime() * player.speed;
+      player.velocity.y += GetFrameTime() * player.speed;
     }
 
   if(IsKeyDown(KEY_A)){
-      player.pos.x -= GetFrameTime() * player.speed;
+      player.velocity.x -= GetFrameTime() * player.speed;
     }
 
   if(IsKeyDown(KEY_D)){
-      player.pos.x += GetFrameTime() * player.speed;
+      player.velocity.x += GetFrameTime() * player.speed;
     }
 
+  player.pos.x += player.velocity.x;
+  player.pos.y += player.velocity.y;
+
+  player.velocity.x *= 0.99f;
+  player.velocity.y *= 0.99f;
 
   checkBoundaries(&player, &world);
 
