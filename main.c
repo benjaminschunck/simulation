@@ -23,7 +23,7 @@ int main(void) {
   const World world = {1900, 1000};
   Player player = {
     .pos = {(float) world.width / 2, (float) world.height / 2},
-    .clonePos = (0, 0),
+    .clonePos = {0, 0},
     .radius = 50,
     .speed = 100,
     .showClone = false,
@@ -35,6 +35,15 @@ int main(void) {
   SetTargetFPS(240);
 
   MaximizeWindow();
+
+  Color bgGrey = {35, 35, 35, 255}; 
+  Color bgLight = {30, 30, 30, 255};
+
+  //Create Checked Image Background
+  Image bgImage = GenImageChecked(world.width, world.height, 50, 50, bgGrey, bgLight);
+
+  Texture2D background = LoadTextureFromImage(bgImage);
+  UnloadImage(bgImage);
 
   while(!WindowShouldClose()){
   
@@ -65,6 +74,8 @@ int main(void) {
   BeginDrawing();
 
     ClearBackground(RAYWHITE);
+    
+    DrawTexture(background, 0, 0, WHITE);
 
     DrawCircleV(player.pos, player.radius, BLUE);
     if(player.showClone)DrawCircleV(player.clonePos, player.radius, BLUE);
