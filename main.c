@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "raylib.h"
+#include <math.h>
 
 typedef struct {
   int width;
@@ -15,10 +16,8 @@ typedef struct Map{
 
 typedef struct {
   Vector2 pos;
-  Vector2 clonePos;
-  float radius;
+  float rotation;
   float speed;
-  bool showClone;
   Vector2 velocity;
 } Player;
 
@@ -32,14 +31,11 @@ int main(void) {
   const World world = {1900, 1000};
   Player player = {
     .pos = {(float) world.width / 2, (float) world.height / 2},
-    .clonePos = {0, 0},
-    .radius = 50,
-    .speed = 100,
-    .showClone = false,
+    .speed = 60,
     .velocity = {0, 0}
   };
 
-  Map map = {1520, 800, 5};
+  Map map = {1520, 800, 2};
 
   float map2D[map.width][map.height]; 
 
@@ -69,28 +65,33 @@ int main(void) {
   while(!WindowShouldClose()){
   
   if(IsKeyDown(KEY_W)){
-      player.velocity.y -= GetFrameTime() * player.speed;
-    }
+
+      float x = cos(player.rotation) * player.speed * GetFrameTime();
+      float y = sin(player.rotation) * player.speed * GetFrameTime();
+
+      player.velocity.x += x;
+      player.velocity.y += y;
+
+  }
 
   if(IsKeyDown(KEY_S)){
-      player.velocity.y += GetFrameTime() * player.speed;
+    player.velocity.x -= 0.1 * player.speed * GetFrameTime();
+    player.velocity.y -= 0.1 * player.speed * GetFrameTime();
     }
 
   if(IsKeyDown(KEY_A)){
-      player.velocity.x -= GetFrameTime() * player.speed;
+    player.rotation -= 0.1f * GetFrameTime();
     }
 
   if(IsKeyDown(KEY_D)){
-      player.velocity.x += GetFrameTime() * player.speed;
-    }
+      player.rotation += 0.1f * GetFrameTime();
+  }
 
-  player.pos.x += player.velocity.x;
-  player.pos.y += player.velocity.y;
+    player.pos.x += player.velocity.x;
+    player.pos.y += player.velocity.y;
 
-  player.velocity.x *= 0.99f;
-  player.velocity.y *= 0.99f;
-
-  checkBoundaries(&player, &world);
+    player.velocity.x *= 0.98f;
+    player.velocity.y *= 0.98f;
 
   BeginDrawing();
 
@@ -109,9 +110,7 @@ int main(void) {
       }
     }
 
-    //DrawCircleV(player.pos, player.radius, BLUE);
-    //if(player.showClone)DrawCircleV(player.clonePos, player.radius, BLUE);
-
+   DrawPoly(player.pos, 3, 5.0f, player.rotation, RED); 
 
     EndDrawing();
 
@@ -144,47 +143,8 @@ Color GetTileColorFromHeight(float height){
 
   return color;
 
-}
+} 
 
 void checkBoundaries(Player* player, const World* world){
-  
-
-  if(player->pos.y > world->height) player->pos.y = 0;
-  if(player->pos.y < 0) player->pos.y = world->height;
-  if(player->pos.x > world->width) player->pos.x = 0;
-  if(player->pos.x < 0) player->pos.x = world->width;
-
-
-  if((player->pos.x + player->radius) > world->width){
-      
-      player->clonePos.x = 0 - (world->width - player->pos.x);
-      player->clonePos.y = player->pos.y;
-
-      player->showClone = true;
-  }else if((player->pos.x - player->radius) < 0){
-    player->clonePos.x = world->width - (0 - player->pos.x); 
-    
-    player->clonePos.y = player->pos.y;
-
-    player->showClone = true;
-    }else if((player->pos.y + player->radius) > world->height){
-
-    player->clonePos.y = 0 - (world->height - player->pos.y);
-    player->clonePos.x = player->pos.x;
-
-    player->showClone = true;
-
-  }else if((player->pos.y - player->radius) < 0){
-
-    player->clonePos.y = world->height - (0 - player->pos.y);
-
-    player->clonePos.x = player->pos.x;
-
-    player->showClone = true;
-    
-  }else{
-    player->showClone = false;
-  }
- 
-  
+    // Kommt später evtl. wieder
 }
