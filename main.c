@@ -1,10 +1,17 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "raylib.h"
 
 typedef struct {
   int width;
   int height;
 } World;
+
+typedef struct Map{
+  int width;
+  int height;
+  int tileSize;
+} Map;
 
 typedef struct {
   Vector2 pos;
@@ -16,6 +23,8 @@ typedef struct {
 } Player;
 
 void checkBoundaries(Player* player, const World* world);
+
+Color GetTileColorFromHeight(float height);
 
 int main(void) {
 
@@ -30,20 +39,32 @@ int main(void) {
     .velocity = {0, 0}
   };
 
+  Map map = {1520, 800, 5};
+
+  float map2D[map.width][map.height]; 
+
+  Image noiseImage = GenImagePerlinNoise(map.width, map.height, map.tileSize, map.tileSize, 1.5f);
+  
+  Color *noiseColors = LoadImageColors(noiseImage);
+
+  for(int i = 0; i < map.width; i++){
+
+      for(int j = 0; j < map.height; j++){
+      map2D[i][j] = (float)noiseColors[(j * map.width) + i].r / 255.0f;
+
+    }
+
+  }
+
+  UnloadImage(noiseImage);
+  UnloadImageColors(noiseColors); 
+
   InitWindow(world.width, world.height, "Test Window");
 
   SetTargetFPS(240);
 
-  MaximizeWindow();
-
   Color bgGrey = {35, 35, 35, 255}; 
   Color bgLight = {30, 30, 30, 255};
-
-  //Create Checked Image Background
-  Image bgImage = GenImageChecked(world.width, world.height, 50, 50, bgGrey, bgLight);
-
-  Texture2D background = LoadTextureFromImage(bgImage);
-  UnloadImage(bgImage);
 
   while(!WindowShouldClose()){
   
@@ -74,20 +95,54 @@ int main(void) {
   BeginDrawing();
 
     ClearBackground(RAYWHITE);
+   
+    for(int i = 0; i < map.width; i++){
     
-    DrawTexture(background, 0, 0, WHITE);
+      for(int j = 0; j < map.height; j++){
+        
+        Color tileColor = GetTileColorFromHeight(map2D[i][j]);
+        
+        
 
-    DrawCircleV(player.pos, player.radius, BLUE);
-    if(player.showClone)DrawCircleV(player.clonePos, player.radius, BLUE);
+        DrawRectangle(i * map.tileSize, j * map.tileSize, map.tileSize, map.tileSize, tileColor);
+    
+      }
+    }
+
+    //DrawCircleV(player.pos, player.radius, BLUE);
+    //if(player.showClone)DrawCircleV(player.clonePos, player.radius, BLUE);
 
 
     EndDrawing();
 
   }
-
-  CloseWindow();
+   CloseWindow();
 
   return 0;
+
+}
+
+Color GetTileColorFromHeight(float height){
+
+  Color color;
+  
+  if(height < 0.3f){
+    color = DARKBLUE;
+  }else if(height < 0.4f){
+    color = BLUE;
+  }else if(height < 0.45){
+    color = YELLOW;
+  }else if(height < 0.47f){
+    color = BROWN;
+  }else if(height < 0.5f){
+    color = GREEN;
+  }else if(height < 0.7f){
+    color = GRAY;
+  }else {
+    color = WHITE;
+  }
+
+  return color;
 
 }
 
