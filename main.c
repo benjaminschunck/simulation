@@ -80,18 +80,18 @@ int main(void) {
     }
 
   if(IsKeyDown(KEY_A)){
-    player.rotation -= 0.1f * GetFrameTime();
+    player.rotation -= 0.1f * GetFrameTime() * player.speed;
     }
 
   if(IsKeyDown(KEY_D)){
-      player.rotation += 0.1f * GetFrameTime();
+      player.rotation += 0.1f * GetFrameTime() * player.speed;
   }
 
     player.pos.x += player.velocity.x;
     player.pos.y += player.velocity.y;
 
-    player.velocity.x *= 0.98f;
-    player.velocity.y *= 0.98f;
+    player.velocity.x *= 0.9f;
+    player.velocity.y *= 0.9f;
 
   BeginDrawing();
 
@@ -110,7 +110,7 @@ int main(void) {
       }
     }
 
-   DrawPoly(player.pos, 3, 5.0f, player.rotation, RED); 
+   DrawPoly(player.pos, 3, 20.0f, player.rotation * RAD2DEG, RED); 
 
     EndDrawing();
 
