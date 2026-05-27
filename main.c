@@ -39,6 +39,12 @@ int main(void) {
 
   float map2D[map.width][map.height]; 
 
+
+  InitWindow(world.width, world.height, "Test Window");
+
+  SetTargetFPS(240);
+
+
   Image noiseImage = GenImagePerlinNoise(map.width, map.height, map.tileSize, map.tileSize, 1.5f);
   
   Color *noiseColors = LoadImageColors(noiseImage);
@@ -55,9 +61,11 @@ int main(void) {
   UnloadImage(noiseImage);
   UnloadImageColors(noiseColors); 
 
-  InitWindow(world.width, world.height, "Test Window");
+  Texture2D planeTex = LoadTexture("assets/ship_K.png");
 
-  SetTargetFPS(240);
+  Vector2 planeOrigin = { planeTex.width / 2.0f, planeTex.height / 2.0f};
+
+  Rectangle sourceRec = {0.0f, 0.0f, (float)planeTex.width, (float)planeTex.height };
 
   Color bgGrey = {35, 35, 35, 255}; 
   Color bgLight = {30, 30, 30, 255};
@@ -75,8 +83,8 @@ int main(void) {
   }
 
   if(IsKeyDown(KEY_S)){
-    player.velocity.x -= 0.1 * player.speed * GetFrameTime();
-    player.velocity.y -= 0.1 * player.speed * GetFrameTime();
+    player.velocity.x -= 0.8;
+    player.velocity.y -= 0.8;
     }
 
   if(IsKeyDown(KEY_A)){
@@ -109,12 +117,20 @@ int main(void) {
     
       }
     }
+  Vector2 shadowPos = { player.pos.x + 10, player.pos.y + 15 };
+    
 
-   DrawPoly(player.pos, 3, 20.0f, player.rotation * RAD2DEG, RED); 
+    Rectangle destRec = {player.pos.x, player.pos.y, (float)planeTex.width, (float)planeTex.height};
+    Rectangle shadowDestRec = { player.pos.x + 10, player.pos.y + 15, (float)planeTex.width, (float)planeTex.height };
+
+    DrawTexturePro(planeTex, sourceRec, shadowDestRec, planeOrigin, (player.rotation * RAD2DEG) + 90, ColorAlpha(BLACK, 0.4f));
+    DrawTexturePro(planeTex, sourceRec, destRec, planeOrigin, (player.rotation * RAD2DEG) + 90, WHITE);
+
 
     EndDrawing();
 
   }
+  UnloadTexture(planeTex);
    CloseWindow();
 
   return 0;
